@@ -68,6 +68,7 @@ class AuthenticationController extends Controller
         $session = $responseData['session'] ?? null;
         $user = $responseData['user_details'] ?? null;
         $permissions = $responseData['permissions'] ?? null;
+        $authorization_pin = $responseData['authorization_pin'] ?? null;
 
         $user_already_signined = UserDetails::where('token', $session['token'])->first();
 
@@ -78,7 +79,7 @@ class AuthenticationController extends Controller
                 "permissions" => json_encode($permissions),
                 "token" => $session['token'],
                 "token_exp" => $session['token_exp'],
-                "authorization_pin" => $session['authorization_pin']
+                "authorization_pin" => $authorization_pin
             ]);
         }else{
             $tokenExpTime = Carbon::parse($session['token_exp']);
