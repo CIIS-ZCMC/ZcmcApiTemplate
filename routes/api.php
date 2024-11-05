@@ -24,6 +24,11 @@ Route::namespace('App\Http\Controllers')->group(function () {
 
         //Re authenticate user if cookie still valid also returning the user details
         Route::get('session-validation', 'AuthenticationController@validateSession');
+
+        // With Authorization Layer
+        Route::middleware(['auth.authorization:PRM view'])->group(function () {
+            // Route::put('api-end-point', 'controller@function');
+        });
     });
     
     /**

@@ -64,6 +64,11 @@ class SessionValidation
          * Merge requester user details in request so that controller has copy of the user information.
          */
         $request->merge(['user' => $user->user_details]);
+        
+        /**
+         * Merge request permissions in request so that authorization middleware has copy of the user permissions.
+         */
+        $request->merge(['permissions' => $user->permissions]);
 
         
         $tokenExpTime = Carbon::parse($user->token_exp);

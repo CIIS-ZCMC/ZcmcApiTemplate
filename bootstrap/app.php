@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\Authorization;
 use App\Http\Middleware\SessionValidation;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias(['authorization' => Authorization::class]);
         $middleware->alias(['session_validation' => SessionValidation::class]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
