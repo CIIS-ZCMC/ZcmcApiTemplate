@@ -13,6 +13,7 @@ class UserDetails extends Model
         'permissions',
         'token',
         'token_exp',
+        'authorization_pin'
     ];
 
     public $timestamps = true;

@@ -78,6 +78,7 @@ class AuthenticationController extends Controller
                 "permissions" => json_encode($permissions),
                 "token" => $session['token'],
                 "token_exp" => $session['token_exp'],
+                "authorization_pin" => $session['authorization_pin']
             ]);
         }else{
             $tokenExpTime = Carbon::parse($session['token_exp']);
@@ -115,5 +116,34 @@ class AuthenticationController extends Controller
     public function validateSession(Request $request)
     {
         return response()->json(["user" => json_decode($request->user)], Response::HTTP_OK);
+    }
+
+    public function signOut(Request $request)
+    {
+        $cookie = $request->cookie(config('app.cookie_name'));
+
+        // In case the value of cookie is array
+        if (is_array($cookie)) {
+            $cookie = $cookie[config("app.cookie_name")];
+        }
+
+        $encryptedToken = json_decode($cookie);
+
+        /**
+         * Decrypt the cookie using openssl, encryption and decryption algorithm and app key.
+         */
+        $token = UtilitiesHelper::decryptToken($encryptedToken);
+
+        /**
+         * Retrieve user details using the token.
+         */
+        $user = UserDetails::where('token', $token)->first();
+
+        $user->delete();
+
+        return response()->json([
+            'user' => null,
+            'message' => "Signout."
+        ], Response::HTTP_OK)->cookie(config('app.cookie_name'), '', -1);
     }
 }

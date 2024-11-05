@@ -25,4 +25,11 @@ Route::namespace('App\Http\Controllers')->group(function () {
         //Re authenticate user if cookie still valid also returning the user details
         Route::get('session-validation', 'AuthenticationController@validateSession');
     });
+    
+    /**
+     * Sign out End point
+     * 
+     * This will signout user from this server but not in umis server.
+     */
+    Route::get('signout', 'AuthenticationController@signOut');
 });

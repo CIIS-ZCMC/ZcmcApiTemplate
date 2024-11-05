@@ -17,6 +17,7 @@ return new class extends Migration
             $table->json('permissions');
             $table->text('token');
             $table->datetime('token_exp');
+            $table->int("authorization_pin")->nullable();
             $table->timestamps();
         });
     }
