@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\SystemLogHelper;
 use App\Helpers\UtilitiesHelper;
 use App\Models\UserDetails;
 use Closure;
@@ -11,9 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 class Authorization
 {
     // Optimized function to check if the module and action exist
-    private function checkModuleAndAction($data, $module, $action) {
-        return array_reduce($data['modules'], function($exists, $mod) use ($module, $action) {
-            return $exists || ($mod['name'] === $module && in_array($action, $mod['permissions']));
+    private function checkModuleAndAction($modules, $module, $action) {
+        return array_reduce($modules, function($exists, $mod) use ($module, $action) {
+            return $exists || ($mod->code === $module && in_array($action, $mod->permissions));
         }, false);
     }
 
@@ -28,7 +29,7 @@ class Authorization
 
         $permissions = json_decode($request->permissions);
 
-        $has_permissions = $this->checkModuleAndAction($permissions, $module, $action);
+        $has_permissions = $this->checkModuleAndAction($permissions->modules, $module, $action);
 
         if(!$has_permissions){
             return response()->json([

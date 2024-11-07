@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\SessionValidation;
+use App\Http\Middleware\Authorization;
+
 
 /**
  * End point to authenticate user requirements session id
@@ -12,7 +14,6 @@ use App\Http\Middleware\SessionValidation;
 Route::namespace('App\Http\Controllers')->group(function () {
     Route::get('authenticate', 'AuthenticationController@authenticate');
 });
-
 
 Route::namespace('App\Http\Controllers')->group(function () {
     /**
@@ -25,9 +26,10 @@ Route::namespace('App\Http\Controllers')->group(function () {
         //Re authenticate user if cookie still valid also returning the user details
         Route::get('session-validation', 'AuthenticationController@validateSession');
 
-        // With Authorization Layer
-        Route::middleware(['auth.authorization:PRM view'])->group(function () {
-            // Route::put('api-end-point', 'controller@function');
+        // With Authorization Layer [Middleware: Module-Code Permission]
+        Route::middleware([Authorization::class.':M-001 view-all'])->group(function () {
+            // End points with action permission must be put here
+            // Route::get('end-point-here', 'controller@function');
         });
     });
     

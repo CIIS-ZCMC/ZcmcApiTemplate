@@ -39,7 +39,6 @@ class AuthenticationController extends Controller
         $url = env("UMIS_DOMAIN")."/api/authenticate-user-session";
         $url .= '?'.http_build_query($params);
 
-
         SystemLogHelper::errorLog("AuthenticationController", "authenticate", $url);
 
         // Initiate request to verify authenticity of session_id
@@ -68,7 +67,10 @@ class AuthenticationController extends Controller
         $session = $responseData['session'] ?? null;
         $user = $responseData['user_details'] ?? null;
         $permissions = $responseData['permissions'] ?? null;
-        $authorization_pin = $responseData['authorization_pin'] ?? null;
+
+        if($session === null){
+            return response()->json(['message' => "Unauthorized from umis."], Response::HTTP_UNAUTHORIZED);
+        }
 
         $user_already_signined = UserDetails::where('token', $session['token'])->first();
 
@@ -79,14 +81,16 @@ class AuthenticationController extends Controller
                 "permissions" => json_encode($permissions),
                 "token" => $session['token'],
                 "token_exp" => $session['token_exp'],
-                "authorization_pin" => $authorization_pin
             ]);
+            
         }else{
             $tokenExpTime = Carbon::parse($session['token_exp']);
             $isTokenExpired = $tokenExpTime->isPast();
 
-            if(!$isTokenExpired){
-                $user_already_signined->delete();
+            if($isTokenExpired){
+                if($user_already_signined !== null){
+                    $user_already_signined->delete();
+                }
                 return response()->json(['message' => "unauthorized token expired"],Response::HTTP_UNAUTHORIZED);
             }
         }
@@ -100,7 +104,9 @@ class AuthenticationController extends Controller
 
         // Attach the cookie in response with target session domain
         return response()->json([
-            'user' => $user
+            'permissions' => $permissions,
+            'user' => $user,
+            "message" => "Test"
         ])->cookie(config('app.cookie_name'), json_encode(['token' => $encryptToken]), 60, '/', config('app.session_domain'), false);
     }
 
